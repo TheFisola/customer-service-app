@@ -2,13 +2,17 @@ package com.thefisola.customerservice.model;
 
 import com.thefisola.customerservice.constant.CustomerRequestStatus;
 import com.thefisola.customerservice.constant.CustomerRequestType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "customer_requests")
 public class CustomerRequest extends BaseModel {
