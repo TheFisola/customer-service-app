@@ -52,7 +52,7 @@ public class Seeder {
     }
 
     private void seedCustomerMessages(User user) {
-        List<List<String>> customerMessages = getParsedData();
+        List<List<String>> customerMessages = getParsedCustomerMessages();
         List<CustomerRequest> customerRequests = new ArrayList<>();
 
         for (List<String> customerMessage : customerMessages) {
@@ -88,19 +88,19 @@ public class Seeder {
         }
     }
 
-    private List<List<String>> getParsedData() {
-        List<List<String>> records = new ArrayList<>();
+    private List<List<String>> getParsedCustomerMessages() {
+        List<List<String>> customerMessages = new ArrayList<>();
         try (var bufferedReader = new BufferedReader(new FileReader("src/main/resources/static/customer_request_sample_data.csv"))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (!line.contains(CSV_HEADER)) {
                     String[] values = line.split(",");
-                    records.add(Arrays.asList(values));
+                    customerMessages.add(Arrays.asList(values));
                 }
             }
         } catch (IOException e) {
             log.error("Error occurred while trying to parse csv ", e);
         }
-        return records;
+        return customerMessages;
     }
 }
