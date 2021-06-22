@@ -52,7 +52,7 @@ public class Seeder {
     }
 
     private void seedCustomerMessages(User user) {
-        List<List<String>> customerMessages = getParsedCustomerMessages();
+        List<List<String>> customerMessages = getCustomerMessagesFromCSV();
         List<CustomerRequest> customerRequests = new ArrayList<>();
 
         for (List<String> customerMessage : customerMessages) {
@@ -88,7 +88,7 @@ public class Seeder {
         }
     }
 
-    private List<List<String>> getParsedCustomerMessages() {
+    private List<List<String>> getCustomerMessagesFromCSV() {
         List<List<String>> customerMessages = new ArrayList<>();
         try (var bufferedReader = new BufferedReader(new FileReader("src/main/resources/static/customer_request_sample_data.csv"))) {
             String line;
