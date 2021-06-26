@@ -11,6 +11,6 @@ public class CustomerRequestDto {
     private String message;
     @NotBlank(message = "Please provide a user Id")
     private String userId;
-    @NotBlank(message = "Please provide a request type")
+
     private CustomerRequestType type;
 }

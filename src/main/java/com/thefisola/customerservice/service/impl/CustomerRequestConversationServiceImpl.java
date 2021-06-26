@@ -2,12 +2,14 @@ package com.thefisola.customerservice.service.impl;
 
 import com.thefisola.customerservice.constant.MessageOwner;
 import com.thefisola.customerservice.dto.SendChatMessageDto;
+import com.thefisola.customerservice.exception.InvalidMessageOwnerException;
 import com.thefisola.customerservice.exception.NotFoundException;
+import com.thefisola.customerservice.model.AgentCustomerRequest;
+import com.thefisola.customerservice.model.CustomerRequest;
 import com.thefisola.customerservice.model.CustomerRequestConversation;
-import com.thefisola.customerservice.repository.AgentRepository;
+import com.thefisola.customerservice.repository.AgentCustomerRequestRepository;
 import com.thefisola.customerservice.repository.CustomerRequestConversationRepository;
 import com.thefisola.customerservice.repository.CustomerRequestRepository;
-import com.thefisola.customerservice.repository.UserRepository;
 import com.thefisola.customerservice.service.CustomerRequestConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,18 +21,14 @@ import java.util.List;
 public class CustomerRequestConversationServiceImpl implements CustomerRequestConversationService {
 
     private final CustomerRequestRepository customerRequestRepository;
-    private final UserRepository userRepository;
-    private final AgentRepository agentRepository;
+    private final AgentCustomerRequestRepository agentCustomerRequestRepository;
     private final CustomerRequestConversationRepository customerRequestConversationRepository;
 
     @Autowired
     public CustomerRequestConversationServiceImpl(CustomerRequestRepository customerRequestRepository,
-                                                  UserRepository userRepository,
-                                                  AgentRepository agentRepository,
-                                                  CustomerRequestConversationRepository customerRequestConversationRepository) {
+                                                  AgentCustomerRequestRepository agentCustomerRequestRepository, CustomerRequestConversationRepository customerRequestConversationRepository) {
         this.customerRequestRepository = customerRequestRepository;
-        this.userRepository = userRepository;
-        this.agentRepository = agentRepository;
+        this.agentCustomerRequestRepository = agentCustomerRequestRepository;
 
         this.customerRequestConversationRepository = customerRequestConversationRepository;
     }
@@ -38,26 +36,36 @@ public class CustomerRequestConversationServiceImpl implements CustomerRequestCo
     @Override
     public List<CustomerRequestConversation> getCustomerRequestConversations(String customerRequestId) {
         var customerRequest = customerRequestRepository.findById(customerRequestId).orElseThrow(NotFoundException::new);
-        return customerRequestConversationRepository.findByByCustomerRequest(customerRequest);
+        return customerRequestConversationRepository.findByCustomerRequest(customerRequest);
     }
 
     @Override
     @Transactional
-    public CustomerRequestConversation sendMessage(SendChatMessageDto chatMessageDto) {
-        var customerRequestConversation = new CustomerRequestConversation().fromDto(chatMessageDto);
-        validateMessageOwner(chatMessageDto.getMessageOwnerId(), chatMessageDto.getMessageOwner());
-        var customerRequest = customerRequestRepository.findById(chatMessageDto.getCustomerRequestId()).orElseThrow(NotFoundException::new);
+    public CustomerRequestConversation sendMessage(SendChatMessageDto sendChatMessageDto) {
+        var customerRequest = validateCustomerRequest(sendChatMessageDto);
+        var customerRequestConversation = new CustomerRequestConversation().fromDto(sendChatMessageDto);
         customerRequestConversation.setCustomerRequest(customerRequest);
         return customerRequestConversationRepository.save(customerRequestConversation);
     }
 
-    private void validateMessageOwner(String messageOwnerId, MessageOwner messageOwner) {
+    private CustomerRequest validateCustomerRequest(SendChatMessageDto sendChatMessageDto) {
+        var customerRequest = customerRequestRepository.findById(sendChatMessageDto.getCustomerRequestId()).orElseThrow(NotFoundException::new);
+        var agentCustomerRequest = agentCustomerRequestRepository.findByCustomerRequest(customerRequest).orElseThrow(UnsupportedOperationException::new);
+        validateMessageOwner(sendChatMessageDto.getMessageOwnerId(), sendChatMessageDto.getMessageOwner(), agentCustomerRequest);
+        return customerRequest;
+    }
+
+
+    private void validateMessageOwner(String messageOwnerId, MessageOwner messageOwner, AgentCustomerRequest agentCustomerRequest) {
+        // TODO: Change to more descriptive exception
         switch (messageOwner) {
             case CUSTOMER:
-                userRepository.findById(messageOwnerId).orElseThrow(NotFoundException::new);
+                if (!agentCustomerRequest.getCustomerRequest().getId().equals(messageOwnerId))
+                    throw new InvalidMessageOwnerException();
                 break;
             case AGENT:
-                agentRepository.findById(messageOwnerId).orElseThrow(NotFoundException::new);
+                if (!agentCustomerRequest.getAgent().getId().equals(messageOwnerId))
+                    throw new InvalidMessageOwnerException();
                 break;
             default:
                 throw new UnsupportedOperationException();

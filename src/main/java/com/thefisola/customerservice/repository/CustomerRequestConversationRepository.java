@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface CustomerRequestConversationRepository extends JpaRepository<CustomerRequestConversation, String> {
-    List<CustomerRequestConversation> findByByCustomerRequest(CustomerRequest customerRequest);
+    List<CustomerRequestConversation> findByCustomerRequest(CustomerRequest customerRequest);
 }
