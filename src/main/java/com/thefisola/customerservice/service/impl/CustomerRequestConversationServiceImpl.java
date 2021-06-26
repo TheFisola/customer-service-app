@@ -3,7 +3,6 @@ package com.thefisola.customerservice.service.impl;
 import com.thefisola.customerservice.constant.MessageOwner;
 import com.thefisola.customerservice.dto.SendChatMessageDto;
 import com.thefisola.customerservice.exception.NotFoundException;
-import com.thefisola.customerservice.model.CustomerRequest;
 import com.thefisola.customerservice.model.CustomerRequestConversation;
 import com.thefisola.customerservice.repository.AgentRepository;
 import com.thefisola.customerservice.repository.CustomerRequestConversationRepository;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class CustomerRequestConversationServiceImpl implements CustomerRequestConversationService {
@@ -36,11 +36,17 @@ public class CustomerRequestConversationServiceImpl implements CustomerRequestCo
     }
 
     @Override
+    public List<CustomerRequestConversation> getCustomerRequestConversations(String customerRequestId) {
+        var customerRequest = customerRequestRepository.findById(customerRequestId).orElseThrow(NotFoundException::new);
+        return customerRequestConversationRepository.findByByCustomerRequest(customerRequest);
+    }
+
+    @Override
     @Transactional
     public CustomerRequestConversation sendMessage(SendChatMessageDto chatMessageDto) {
-        CustomerRequestConversation customerRequestConversation = new CustomerRequestConversation().fromDto(chatMessageDto);
+        var customerRequestConversation = new CustomerRequestConversation().fromDto(chatMessageDto);
         validateMessageOwner(chatMessageDto.getMessageOwnerId(), chatMessageDto.getMessageOwner());
-        CustomerRequest customerRequest = customerRequestRepository.findById(chatMessageDto.getCustomerRequestId()).orElseThrow(NotFoundException::new);
+        var customerRequest = customerRequestRepository.findById(chatMessageDto.getCustomerRequestId()).orElseThrow(NotFoundException::new);
         customerRequestConversation.setCustomerRequest(customerRequest);
         return customerRequestConversationRepository.save(customerRequestConversation);
     }

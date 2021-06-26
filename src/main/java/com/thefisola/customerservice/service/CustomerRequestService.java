@@ -7,6 +7,8 @@ import com.thefisola.customerservice.model.CustomerRequest;
 import org.springframework.data.domain.Page;
 
 public interface CustomerRequestService {
+    CustomerRequest getCustomerRequest(String customerRequestId);
+
     Page<CustomerRequest> getCustomerRequests(CustomerRequestFilterOptions filterOptions);
 
     CustomerRequest createCustomerRequest(CustomerRequestDto customerRequestDto);

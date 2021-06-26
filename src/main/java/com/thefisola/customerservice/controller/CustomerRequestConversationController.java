@@ -5,12 +5,10 @@ import com.thefisola.customerservice.dto.response.BaseResponse;
 import com.thefisola.customerservice.model.CustomerRequestConversation;
 import com.thefisola.customerservice.service.CustomerRequestConversationService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/customer-request-conversations")
@@ -20,6 +18,11 @@ public class CustomerRequestConversationController {
 
     public CustomerRequestConversationController(CustomerRequestConversationService customerRequestConversationService) {
         this.customerRequestConversationService = customerRequestConversationService;
+    }
+
+    @GetMapping
+    public BaseResponse<List<CustomerRequestConversation>> getCustomerRequestConversation(@RequestParam String customerRequestId) {
+        return new BaseResponse<>(customerRequestConversationService.getCustomerRequestConversations(customerRequestId), HttpStatus.OK);
     }
 
     @PostMapping

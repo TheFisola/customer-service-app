@@ -24,6 +24,11 @@ public class CustomerRequestController {
         this.customerRequestService = customerRequestService;
     }
 
+    @GetMapping("{customerRequestId}")
+    public BaseResponse<CustomerRequest> getCustomerRequests(@PathVariable String customerRequestId) {
+        return new BaseResponse<>(customerRequestService.getCustomerRequest(customerRequestId), HttpStatus.OK);
+    }
+
     @GetMapping
     public BaseResponse<Page<CustomerRequest>> getCustomerRequests(@Valid CustomerRequestFilterOptions filterOptions) {
         return new BaseResponse<>(customerRequestService.getCustomerRequests(filterOptions), HttpStatus.OK);

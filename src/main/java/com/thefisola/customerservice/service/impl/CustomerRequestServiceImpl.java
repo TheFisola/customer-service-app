@@ -49,6 +49,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
     @Override
+    public CustomerRequest getCustomerRequest(String customerRequestId) {
+        return customerRequestRepository.findById(customerRequestId)
+                .orElseThrow(NotFoundException::new);
+    }
+
+    @Override
     @Transactional
     public CustomerRequest createCustomerRequest(CustomerRequestDto customerRequestDto) {
         var customerRequest = new CustomerRequest().fromDto(customerRequestDto);
@@ -60,8 +66,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     @Transactional
     public CustomerRequest attendToCustomerRequest(AttendToCustomerRequestDto attendToCustomerRequestDto) {
-        var customerRequest = customerRequestRepository.findById(attendToCustomerRequestDto.getCustomerRequestId())
-                .orElseThrow(NotFoundException::new);
+        var customerRequest = getCustomerRequest(attendToCustomerRequestDto.getCustomerRequestId());
         var agent = agentRepository.findById(attendToCustomerRequestDto.getAgentId())
                 .orElseThrow(NotFoundException::new);
         initiateCustomerRequestConversation(customerRequest);
