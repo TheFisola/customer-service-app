@@ -1,5 +1,5 @@
 package com.thefisola.customerservice.constant;
 
 public enum CustomerRequestStatus {
-    AWAITING_RESPONSE, PICKED, FINALISED
+    AWAITING_RESPONSE, ATTENDING_TO_REQUEST, FINALISED_REQUEST
 }

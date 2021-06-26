@@ -2,8 +2,10 @@ package com.thefisola.customerservice.seeder;
 
 import com.thefisola.customerservice.constant.CustomerRequestStatus;
 import com.thefisola.customerservice.constant.CustomerRequestType;
+import com.thefisola.customerservice.model.Agent;
 import com.thefisola.customerservice.model.CustomerRequest;
 import com.thefisola.customerservice.model.User;
+import com.thefisola.customerservice.repository.AgentRepository;
 import com.thefisola.customerservice.repository.CustomerRequestRepository;
 import com.thefisola.customerservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -27,11 +30,17 @@ public class Seeder {
     private static final String CSV_HEADER = "User ID,Timestamp (UTC),Message Body";
     private final CustomerRequestRepository customerRequestRepository;
     private final UserRepository userRepository;
+    private final AgentRepository agentRepository;
 
     @Autowired
-    public Seeder(CustomerRequestRepository customerRequestRepository, UserRepository userRepository) {
+    public Seeder(CustomerRequestRepository customerRequestRepository, UserRepository userRepository, AgentRepository agentRepository) {
         this.customerRequestRepository = customerRequestRepository;
         this.userRepository = userRepository;
+        this.agentRepository = agentRepository;
+    }
+
+    public static int getRandomIndex(int min, int max) {
+        return new Random().nextInt(max - min) + min;
     }
 
     @EventListener
@@ -45,13 +54,13 @@ public class Seeder {
         return (!customerRequestRepository.findAll().isEmpty() && !userRepository.findAll().isEmpty());
     }
 
-
     private void seedDefaultData() {
-        var user = seedUser();
-        seedCustomerMessages(user);
+        seedAgents();
+        var users = seedUsers();
+        seedCustomerMessages(users);
     }
 
-    private void seedCustomerMessages(User user) {
+    private void seedCustomerMessages(List<User> users) {
         List<List<String>> customerMessages = getCustomerMessagesFromCSV();
         List<CustomerRequest> customerRequests = new ArrayList<>();
 
@@ -59,7 +68,7 @@ public class Seeder {
             String messageBody = customerMessage.get(2);
             var customerRequest = CustomerRequest.builder()
                     .message(messageBody)
-                    .user(user)
+                    .user(users.get(getRandomIndex(0, 2)))
                     .status(CustomerRequestStatus.AWAITING_RESPONSE)
                     .type(getRequestTypeFromMessage(messageBody))
                     .build();
@@ -69,13 +78,38 @@ public class Seeder {
         customerRequestRepository.saveAll(customerRequests);
     }
 
-
-    private User seedUser() {
-        var user = User.builder()
+    private List<User> seedUsers() {
+        var user1 = User.builder()
                 .name("Adigun Adefisola")
-                .email("sample-user@gmail.com")
+                .email("sample-user-1@gmail.com")
                 .build();
-        return userRepository.save(user);
+        var user2 = User.builder()
+                .name("Lionel Messi")
+                .email("sample-user-2@gmail.com")
+                .build();
+        var user3 = User.builder()
+                .name("Eden Hazard")
+                .email("sample-user-3@gmail.com")
+                .build();
+
+        return userRepository.saveAll(List.of(user1, user2, user3));
+    }
+
+    private List<Agent> seedAgents() {
+        var agent1 = Agent.builder()
+                .name("Jorge Mendes")
+                .email("sample-agent-1@gmail.com")
+                .build();
+        var agent2 = Agent.builder()
+                .name("Romelu Lukaku")
+                .email("sample-agent-2@gmail.com")
+                .build();
+        var agent3 = Agent.builder()
+                .name("Reece James")
+                .email("sample-agent-3@gmail.com")
+                .build();
+
+        return agentRepository.saveAll(List.of(agent1, agent2, agent3));
     }
 
     private CustomerRequestType getRequestTypeFromMessage(String message) {
@@ -83,6 +117,8 @@ public class Seeder {
             return CustomerRequestType.LOAN;
         } else if (message.toLowerCase().contains("wallet")) {
             return CustomerRequestType.WALLET;
+        } else if (message.toLowerCase().contains("enquire")) {
+            return CustomerRequestType.ENQUIRY;
         } else {
             return CustomerRequestType.OTHERS;
         }
