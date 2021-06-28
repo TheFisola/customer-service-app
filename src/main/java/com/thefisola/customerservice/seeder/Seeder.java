@@ -126,7 +126,7 @@ public class Seeder {
 
     private List<List<String>> getCustomerMessagesFromCSV() {
         List<List<String>> customerMessages = new ArrayList<>();
-        try (var bufferedReader = new BufferedReader(new FileReader("src/main/resources/static/customer_request_sample_data.csv"))) {
+        try (var bufferedReader = new BufferedReader(new FileReader("src/main/resources/db/data/customer_request_sample_data.csv"))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (!line.contains(CSV_HEADER)) {

@@ -6,6 +6,7 @@ import com.thefisola.customerservice.dto.AttendToCustomerRequestDto;
 import com.thefisola.customerservice.dto.CustomerRequestDto;
 import com.thefisola.customerservice.dto.query.CustomerRequestFilterOptions;
 import com.thefisola.customerservice.exception.NotFoundException;
+import com.thefisola.customerservice.model.Agent;
 import com.thefisola.customerservice.model.AgentCustomerRequest;
 import com.thefisola.customerservice.model.CustomerRequest;
 import com.thefisola.customerservice.model.CustomerRequestConversation;
@@ -55,6 +56,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
     @Override
+    public Agent getAgentAttendingToRequest(String customerRequestId) {
+        var customerRequest = getCustomerRequest(customerRequestId);
+        var agentCustomerRequest = agentCustomerRequestRepository.findByCustomerRequest(customerRequest).orElseThrow(NotFoundException::new);
+        return agentCustomerRequest.getAgent();
+    }
+
+    @Override
     @Transactional
     public CustomerRequest createCustomerRequest(CustomerRequestDto customerRequestDto) {
         var customerRequest = new CustomerRequest().fromDto(customerRequestDto);
@@ -80,6 +88,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     public CustomerRequest markRequestAsFinalised(String customerRequestId) {
         var customerRequest = customerRequestRepository.findById(customerRequestId)
                 .orElseThrow(NotFoundException::new);
+        // cannot finalise a request unless it was attended to
+        if (!customerRequest.getStatus().equals(CustomerRequestStatus.ATTENDING_TO_REQUEST))
+            throw new UnsupportedOperationException();
         customerRequest.setStatus(CustomerRequestStatus.FINALISED_REQUEST);
         customerRequest.setFinalisedOn(new Date());
         return customerRequestRepository.save(customerRequest);

@@ -6,16 +6,14 @@ import com.thefisola.customerservice.dto.response.LoginResponse;
 import com.thefisola.customerservice.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 /**
  * MOCK LOGIN WITHOUT AUTHENTICATION
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {

@@ -4,6 +4,7 @@ import com.thefisola.customerservice.dto.AttendToCustomerRequestDto;
 import com.thefisola.customerservice.dto.CustomerRequestDto;
 import com.thefisola.customerservice.dto.query.CustomerRequestFilterOptions;
 import com.thefisola.customerservice.dto.response.BaseResponse;
+import com.thefisola.customerservice.model.Agent;
 import com.thefisola.customerservice.model.CustomerRequest;
 import com.thefisola.customerservice.service.CustomerRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/customer-requests")
 public class CustomerRequestController {
@@ -32,6 +34,11 @@ public class CustomerRequestController {
     @GetMapping
     public BaseResponse<Page<CustomerRequest>> getCustomerRequests(@Valid CustomerRequestFilterOptions filterOptions) {
         return new BaseResponse<>(customerRequestService.getCustomerRequests(filterOptions), HttpStatus.OK);
+    }
+
+    @GetMapping("{customerRequestId}/agent")
+    public BaseResponse<Agent> getAgentAttendingToRequest(@PathVariable String customerRequestId) {
+        return new BaseResponse<>(customerRequestService.getAgentAttendingToRequest(customerRequestId), HttpStatus.OK);
     }
 
     @PostMapping

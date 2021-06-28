@@ -1,5 +1,6 @@
 package com.thefisola.customerservice.service.impl;
 
+import com.thefisola.customerservice.constant.CustomerRequestStatus;
 import com.thefisola.customerservice.constant.MessageOwner;
 import com.thefisola.customerservice.dto.SendChatMessageDto;
 import com.thefisola.customerservice.exception.InvalidMessageOwnerException;
@@ -36,7 +37,7 @@ public class CustomerRequestConversationServiceImpl implements CustomerRequestCo
     @Override
     public List<CustomerRequestConversation> getCustomerRequestConversations(String customerRequestId) {
         var customerRequest = customerRequestRepository.findById(customerRequestId).orElseThrow(NotFoundException::new);
-        return customerRequestConversationRepository.findByCustomerRequest(customerRequest);
+        return customerRequestConversationRepository.findByCustomerRequestOrderByCreatedOn(customerRequest);
     }
 
     @Override
@@ -50,6 +51,8 @@ public class CustomerRequestConversationServiceImpl implements CustomerRequestCo
 
     private CustomerRequest validateCustomerRequest(SendChatMessageDto sendChatMessageDto) {
         var customerRequest = customerRequestRepository.findById(sendChatMessageDto.getCustomerRequestId()).orElseThrow(NotFoundException::new);
+        if (customerRequest.getStatus() != CustomerRequestStatus.ATTENDING_TO_REQUEST)
+            throw new UnsupportedOperationException();
         var agentCustomerRequest = agentCustomerRequestRepository.findByCustomerRequest(customerRequest).orElseThrow(UnsupportedOperationException::new);
         validateMessageOwner(sendChatMessageDto.getMessageOwnerId(), sendChatMessageDto.getMessageOwner(), agentCustomerRequest);
         return customerRequest;
@@ -57,10 +60,9 @@ public class CustomerRequestConversationServiceImpl implements CustomerRequestCo
 
 
     private void validateMessageOwner(String messageOwnerId, MessageOwner messageOwner, AgentCustomerRequest agentCustomerRequest) {
-        // TODO: Change to more descriptive exception
         switch (messageOwner) {
             case CUSTOMER:
-                if (!agentCustomerRequest.getCustomerRequest().getId().equals(messageOwnerId))
+                if (!agentCustomerRequest.getCustomerRequest().getUser().getId().equals(messageOwnerId))
                     throw new InvalidMessageOwnerException();
                 break;
             case AGENT:

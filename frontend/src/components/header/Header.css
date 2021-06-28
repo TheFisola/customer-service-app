@@ -1,0 +1,22 @@
+.bg-login-image {
+  background: url('https://source.unsplash.com/Fo-HQUlRGkU/600x800');
+  background-position: center;
+  background-size: cover;
+}
+
+.login {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.img-profile {
+  height: 2rem;
+  width: 2rem;
+}
+
+.navbar-brand {
+  font-size: xx-large;
+}
