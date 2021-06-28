@@ -10,6 +10,7 @@ class CustomerChatUI extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      agent: {},
       customerRequest: {},
       customerConversations: [],
       loginRole: 'agent',
@@ -35,6 +36,20 @@ class CustomerChatUI extends Component {
             data.status == 'FINALISED_REQUEST',
         })
       );
+
+      await fetch(
+        `http://localhost:9090/api/customer-requests/${customerRequestId}/agent`
+      )
+        .then((response) => response.json())
+        .then((data) =>
+          this.setState({
+            loading: false,
+            customerRequest: data,
+            openChatBox:
+              data.status == 'ATTENDING_TO_REQUEST' ||
+              data.status == 'FINALISED_REQUEST',
+          })
+        );
   }
 
   async attendToCustomerRequest(customerRequestId) {
@@ -87,7 +102,7 @@ class CustomerChatUI extends Component {
   }
 
   render() {
-    const { customerRequest, openChatBox, loginRole, loading } = this.state;
+    const { customerRequest, openChatBox, loginRole, agent, loading } = this.state;
 
     if (loading) {
       return <img src={window.location.origin + '/img/loader.gif'}></img>;
@@ -104,6 +119,7 @@ class CustomerChatUI extends Component {
           <ChatBox
             customerRequest={customerRequest}
             loginRole={loginRole}
+            agent={agent}
           ></ChatBox>
         </div>
       </div>

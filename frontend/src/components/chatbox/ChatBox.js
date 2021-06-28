@@ -10,6 +10,7 @@ class ChatBox extends Component {
     this.stompClient = null;
     // get login user from local storage
     this.state = {
+      agent: props.agent,
       customerConversations: [],
       customerRequest: props.customerRequest,
       loginRole: props.loginRole == 'user' ? 'CUSTOMER' : 'AGENT',
