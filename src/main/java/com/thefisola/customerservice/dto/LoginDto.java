@@ -10,5 +10,5 @@ import java.io.Serializable;
 public class LoginDto implements Serializable {
     @NotBlank(message = "Please provide an email")
     private String email;
-    private LoginRole role;
+    private LoginRole role = LoginRole.AGENT;
 }

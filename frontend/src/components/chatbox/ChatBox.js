@@ -10,7 +10,8 @@ class ChatBox extends Component {
     this.stompClient = null;
     // get login user from local storage
     this.state = {
-      agent: props.agent,
+      anotherAgentWorkingOnIt: props.anotherAgentWorkingOnIt,
+      agentIdOfLoggedInUser: props.agentIdOfLoggedInUser,
       customerConversations: [],
       customerRequest: props.customerRequest,
       loginRole: props.loginRole == 'user' ? 'CUSTOMER' : 'AGENT',
@@ -20,7 +21,7 @@ class ChatBox extends Component {
 
   async componentDidMount() {
     this.connect();
-    this.addSendMessageOnEnterListener()
+    this.addSendMessageOnEnterListener();
     await fetch(
       `http://localhost:9090/api/customer-request-conversations?customerRequestId=${this.state.customerRequest.id}`
     )
@@ -37,12 +38,13 @@ class ChatBox extends Component {
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, () => {
       const { customerRequest, customerConversations } = this.state;
-      this.stompClient.subscribe('/topic/messages', (messageOutput) => {
-        const newConversationEntry = JSON.parse(messageOutput.body);
-        if (newConversationEntry.customerRequest.id == customerRequest.id) {
+      this.stompClient.subscribe(
+        '/topic/messages/' + customerRequest.id,
+        (messageOutput) => {
+          const newConversationEntry = JSON.parse(messageOutput.body);
           this.updateChatState(customerConversations, newConversationEntry);
         }
-      });
+      );
     });
   }
 
@@ -79,10 +81,8 @@ class ChatBox extends Component {
       return;
     }
 
-    console.log('LOGIN ROLE: ', this.state.loginRole);
-
     this.stompClient.send(
-      '/app/chat',
+      '/app/chat/' + this.state.customerRequest.id,
       {},
       JSON.stringify({
         customerRequestId: this.state.customerRequest.id,
@@ -90,7 +90,7 @@ class ChatBox extends Component {
         messageOwner: this.state.loginRole,
         messageOwnerId:
           this.state.loginRole == 'AGENT'
-            ? '500cb8ca-1f25-4acb-833f-4c3ceee7e6a4'
+            ? this.state.agentIdOfLoggedInUser
             : this.state.customerRequest.user.id,
       })
     );
@@ -98,10 +98,17 @@ class ChatBox extends Component {
   }
 
   render() {
-    const { requestFinalized, customerConversations, loginRole } = this.state;
+    const {
+      requestFinalized,
+      customerConversations,
+      loginRole,
+      anotherAgentWorkingOnIt,
+    } = this.state;
 
-    const placeholder = requestFinalized
-      ? 'Text field disabled as request has already being marked as finalized'
+    const placeholder = anotherAgentWorkingOnIt
+      ? '***Another agent is currently working on this request***'
+      : requestFinalized
+      ? '***Text field disabled as request has already being marked as finalized***'
       : 'Type your message here ...';
 
     const conversations = customerConversations.map((conversation) => {
@@ -131,7 +138,7 @@ class ChatBox extends Component {
               type='text'
               rows='3'
               placeholder={placeholder}
-              disabled={requestFinalized}
+              disabled={requestFinalized || anotherAgentWorkingOnIt}
             ></textarea>
 
             {!requestFinalized && (

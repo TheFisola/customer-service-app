@@ -73,7 +73,7 @@ class CustomerRequest extends Component {
             <th scope='row'>{index + addToIndex}</th>
             <td>{message}</td>
             <td>{customerRequest.type}</td>
-            <td>{customerRequest.status.replaceAll('_', ' ')}</td>
+            <td>{customerRequest.status?.replaceAll('_', ' ')}</td>
             <td>{customerRequest.createdOn}</td>
             <td>
               <div className='d-inline justify-content-center text-center'>

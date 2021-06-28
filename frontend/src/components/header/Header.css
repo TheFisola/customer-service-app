@@ -20,3 +20,7 @@
 .navbar-brand {
   font-size: xx-large;
 }
+
+a{
+  cursor: pointer;
+}

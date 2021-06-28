@@ -3,7 +3,30 @@ import './Header.css';
 import { Link } from 'react-router-dom';
 
 class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      agent: {},
+    };
+  }
+
+  componentDidMount() {
+    const agent = localStorage.getItem('LOGGED_IN_AGENT');
+    if (agent === null) {
+      this.logout();
+      return;
+    }
+    this.setState({ agent: JSON.parse(agent) });
+  }
+
+  logout() {
+    localStorage.clear();
+    window.location.href = window.location.origin;
+  }
+
   render() {
+    const agent = this.state.agent;
+
     return (
       <nav className='navbar navbar-expand navbar-dark bg-dark topbar mb-4 static-top shadow'>
         <a class='navbar-brand' href='#'>
@@ -28,7 +51,7 @@ class Header extends Component {
               aria-expanded='false'
             >
               <span className='mr-2 d-none d-lg-inline text-white'>
-                Adigun Adefisola
+                {agent.name}
               </span>
               <img
                 className='img-profile rounded-circle'
@@ -40,14 +63,15 @@ class Header extends Component {
               className='dropdown-menu dropdown-menu-right shadow animated--grow-in'
               aria-labelledby='userDropdown'
             >
-              {/* <div className='dropdown-divider' /> */}
-              <Link
-              to = '/'
+              <a
+                onClick={() => {
+                  this.logout();
+                }}
                 className='dropdown-item'
               >
                 <i className='fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400' />
                 Logout
-              </Link>
+              </a>
             </div>
           </li>
         </ul>

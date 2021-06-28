@@ -24,12 +24,12 @@ class Home extends Component {
                         >
                           Login As An Agent
                         </Link>
-                        <Link
+                        {/* <Link
                           to='/user/login'
                           className='btn btn-dark btn-user btn-block'
                         >
                           Login As A User
-                        </Link>
+                        </Link> */}
                         <hr />
                       </form>
                     </div>
