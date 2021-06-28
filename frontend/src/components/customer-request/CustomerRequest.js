@@ -17,7 +17,7 @@ class CustomerRequest extends Component {
 
   async componentDidMount() {
     await fetch(
-      `http://localhost:9090/api/customer-requests?pageSize=${this.state.pageSize}`
+      `${process.env.REACT_APP_BASE_URL}/api/customer-requests?pageSize=${this.state.pageSize}`
     )
       .then((response) => response.json())
       .then((data) =>
@@ -32,7 +32,7 @@ class CustomerRequest extends Component {
   async getCustomerRequests(pageNumber) {
     this.setState({loading: true})
     await fetch(
-      `http://localhost:9090/api/customer-requests?pageNumber=${pageNumber}&pageSize=${this.state.pageSize}`
+      `${process.env.REACT_APP_BASE_URL}/api/customer-requests?pageNumber=${pageNumber}&pageSize=${this.state.pageSize}`
     )
       .then((response) => response.json())
       .then((data) =>

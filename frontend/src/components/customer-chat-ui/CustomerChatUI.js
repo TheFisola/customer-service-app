@@ -26,7 +26,7 @@ class CustomerChatUI extends Component {
     
     this.setState({ loginRole: pathNameSplit[1]});
     await fetch(
-      `http://localhost:9090/api/customer-requests/${customerRequestId}`
+      `${process.env.REACT_APP_BASE_URL}/api/customer-requests/${customerRequestId}`
     )
       .then((response) => response.json())
       .then((data) =>
@@ -40,7 +40,7 @@ class CustomerChatUI extends Component {
 
     try {
       const response = await fetch(
-        `http://localhost:9090/api/customer-requests/${customerRequestId}/agent`
+        `${process.env.REACT_APP_BASE_URL}/api/customer-requests/${customerRequestId}/agent`
       );
       if (response.status === 200) {
         const data = await response.json();
@@ -58,7 +58,7 @@ class CustomerChatUI extends Component {
   async updateAgentState(customerRequestId) {
     try {
       const response = await fetch(
-        `http://localhost:9090/api/customer-requests/${customerRequestId}/agent`
+        `${process.env.REACT_APP_BASE_URL}/api/customer-requests/${customerRequestId}/agent`
       );
       if (response.status === 200) {
         const data = await response.json();
@@ -74,7 +74,7 @@ class CustomerChatUI extends Component {
   async attendToCustomerRequest(customerRequestId) {
     const loggedAgent = JSON.parse(localStorage.getItem('LOGGED_IN_AGENT'));
     this.setState({ loading: true });
-    await fetch(`http://localhost:9090/api/customer-requests/attend`, {
+    await fetch(`${process.env.REACT_APP_BASE_URL}/api/customer-requests/attend`, {
       method: 'PUT',
       body: JSON.stringify({
         agentId: loggedAgent.id,
@@ -103,7 +103,7 @@ class CustomerChatUI extends Component {
     this.setState({ loading: true });
 
     await fetch(
-      `http://localhost:9090/api/customer-requests/${customerRequestId}/finalise`,
+      `${process.env.REACT_APP_BASE_URL}/api/customer-requests/${customerRequestId}/finalise`,
       {
         method: 'PUT',
         headers: {

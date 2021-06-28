@@ -27,7 +27,7 @@ class Login extends Component {
         window.alert('Please provide email!');
         return;
       }
-      const response = await fetch(`http://localhost:9090/api/login`, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/login`, {
         method: 'POST',
         body: JSON.stringify({
           email: email,

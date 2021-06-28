@@ -23,7 +23,7 @@ class ChatBox extends Component {
     this.connect();
     this.addSendMessageOnEnterListener();
     await fetch(
-      `http://localhost:9090/api/customer-request-conversations?customerRequestId=${this.state.customerRequest.id}`
+      `${process.env.REACT_APP_BASE_URL}/api/customer-request-conversations?customerRequestId=${this.state.customerRequest.id}`
     )
       .then((response) => response.json())
       .then((data) =>
@@ -34,7 +34,7 @@ class ChatBox extends Component {
   }
 
   connect() {
-    const socket = new SockJS('http://localhost:9090/chat');
+    const socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/chat`);
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, () => {
       const { customerRequest, customerConversations } = this.state;
