@@ -34,7 +34,7 @@ class ChatBox extends Component {
   }
 
   connect() {
-    const socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/chat`);
+    const socket = new SockJS(`${process.env.REACT_APP_WS_URL}/chat`);
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, () => {
       const { customerRequest, customerConversations } = this.state;
