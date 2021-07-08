@@ -23,3 +23,8 @@ See `.env.sample` for sample properties for local deployment.
 DEMO URL:
 
 `https://master.d10fgpnvjpn9y0.amplifyapp.com`
+
+
+**Entity Relationship Daigram**
+
+![ERD](https://i.imgur.com/mSeyRL8.png)
